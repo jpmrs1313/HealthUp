@@ -1,0 +1,82 @@
+﻿@model HealthUp.Models.Ginasio
+@{
+    Layout = "~/Views/Shared/_CustomLayout.cshtml";
+}
+<!--Slide informativo-->
+<div class="hero-slider">
+    <div class="hero-items owl-carousel">
+        <div class="single-hero-item set-bg" data-setbg="img/slide-1.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="hero-text">
+                            <h1>O que é o HealthUp?</h1>
+                            <p>
+                                O HealthUp é um ginásio cujo principal objetivo é proporcionar aos seus clientes 
+                                um estilo de vida saudável. Para isso contamos com uma equipa especializada
+                                nas mais diversas áreas do desporto que irá acompanhar os seus clientes.
+                                O HealthUp conta com vários horários de aulas flexíveis.
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="single-hero-item set-bg" data-setbg="img/slide-2.jpg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="hero-text">
+                            <h1>Como surgiu o HealthUp?</h1>
+                            <p>
+                                O HealthUp surgiu devido a um projeto universitário, onde alunos da Universidade de 
+                                Trás-Os-Montes e Alto Douro criaram um website para um ginásio fictício, já com o
+                                website composto decidiram aplicá-lo ao nosso ginásio de modo a facilitar a interação com os nossos clientes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Fim do slide-->
+<!-- Call To Section Begin -->
+<section class="callto-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="callto-text">
+                    <h2>Venha treinar connosco</h2>
+                    <p>Torne o seu estilo de vida saudável!</p>
+                    <p>Levante-se do sofá e venha treinar!!</p>
+                    <a asp-controller="Utilizadores" asp-action="PedidoSocio" class="primary-btn callto-btn">Aderir</a> <!--Redirecionar para a view de registo-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Call To Section End -->
+<!--Mapa dinâmico-->
+<div id="map"></div>
+<script>
+    // Initialize and add the map
+    function initMap() {
+        var latitude = @ViewBag.Latitude;
+        var longitude = @ViewBag.Longitude;
+        //Obter coordenadas base de dados
+        var uluru = { lat: latitude, lng: longitude };
+        // Mapa centrado nesse ponto, com o respetivo zoom
+        var map = new google.maps.Map(
+            document.getElementById('map'), { zoom: 16, center: uluru });
+        // Marcador posicionado no mapa
+        var marker = new google.maps.Marker({ position: uluru, map: map });
+    }
+</script>
+<!--Faz load do API map a partir do link,
+    contém a APIKey do projeto, assim como a função: initMap
+-->
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9eT62A6hmBtUQ710Zrb9rA5c2BlnwFws&callback=initMap">
+</script>

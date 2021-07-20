@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthUp</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/jqueryui/jquery-ui.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+            .topnav a {
+                float: left;
+                color: #f2f2f2;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+                font-size: 17px;
+            }
+
+                .topnav a:hover {
+                    background-color: #ddd;
+                    color: black;
+                }
+
+                .topnav a.active {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+
+        .topnav-right {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="topnav">
+            <a class="active" asp-controller="Home" asp-action="Index">Home</a>
+
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <a asp-controller="Utilizadores" asp-action="PlanoSemanal">Plano semanal de aulas</a>
+
+            @if (Context.Session.GetString("Role") == "Admin")
+            {
+                <a asp-controller="Admins" asp-action="Index">Painel de gestão</a>
+            }
+
+            @if (Context.Session.GetString("Role") == "Socio")
+            {
+                <a asp-controller="Socios" asp-action="Index">Painel de sócios</a>
+            }
+
+            @if (Context.Session.GetString("Role") == "Professor")
+            {
+                <a asp-controller="Professores" asp-action="Index">Painel de professores</a>
+            }
+
+            <div class="topnav-right">
+
+                @if (Context.Session.GetString("UserId") == null)
+                {
+                    <a asp-controller="Utilizadores" asp-action="PedidoSocio">Aderir ao HealthUp</a>
+                }
+
+                @if (Context.Session.GetString("UserId") == null)
+                {
+                    <a asp-controller="Utilizadores" asp-action="Login">Login</a>
+                }
+                else
+                {
+                    <a asp-controller="Utilizadores" asp-action="Logout">Logout</a>
+                }
+            </div>
+        </div>
+</header>
+    <div class="container">
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2019 - HealthUp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jqueryui/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

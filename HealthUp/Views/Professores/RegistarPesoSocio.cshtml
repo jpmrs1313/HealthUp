@@ -1,0 +1,36 @@
+﻿@model HealthUp.Models.Socio
+
+@{
+    ViewData["Title"] = "Registar Peso";
+    Layout = "~/Views/Shared/_CustomLayout.cshtml";
+}
+
+<div class="container">
+    <h1>Registar peso de sócio</h1>
+    <hr />
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="RegistarPesoSocio">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="NumSocioNavigation.Nome" class="labeltabela"></label>
+                    <select name="SocioEscolhido" class="form-control" style="width:auto" asp-items="@ViewBag.Socios"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Peso" class="labeltabela"></label>
+                    <input asp-for="Peso" required pattern="^\d*(\.\d{0,2})?$" class="form-control" />
+                    <span asp-validation-for="Peso" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Registar peso" class="primary-btn" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

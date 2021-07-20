@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Erro";
+    Layout = "~/Views/Shared/_CustomLayout.cshtml";
+}
+
+<div class="container">
+    <h1 class="text-danger">Erro!</h1>
+    <h2 class="text-danger">Occoreu um erro ao processar o seu pedido.</h2>
+
+    <div>
+        @ViewData["mensagem"]
+    </div>
+</div>

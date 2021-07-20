@@ -1,0 +1,30 @@
+﻿@model HealthUp.Models.PlanoTreino
+
+@{
+    ViewData["Title"] = "Criar novo plano";
+    Layout = "~/Views/Shared/_CustomLayout.cshtml";
+}
+
+<div class="container">
+<h1>Criar novo plano</h1>
+<hr />
+<br />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="NumSocio" class="control-label"></label>
+                <select asp-for="NumSocio" class ="form-control" asp-items="ViewBag.Socios"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Descricao" class="control-label"></label>
+                <textarea name="Descricao" rows="5" cols="100" required style="resize:none"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Criar plano" class="primary-btn" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>

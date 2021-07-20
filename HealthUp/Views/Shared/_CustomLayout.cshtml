@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>@ViewData["Title"] - HealthUp</title>
+    <!--Ícon do site-->
+    <link rel="shortcut icon" type="image/x-icon" href="~/logoicon.ico" />
+
+    <!--Fonte AweSome-->
+    <script src="https://kit.fontawesome.com/210c3af75f.js" crossorigin="anonymous"></script>
+
+    <!--Scrpit do gráfico para histórico de peso-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:400,500,600,700&display=swap" rel="stylesheet">
+
+    <!--Estilo css-->
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="~/css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="~/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="~/css/mystyle.css" type="text/css">
+</head>
+<body>
+    <header>
+        @{
+            var db = Context.RequestServices.GetRequiredService<HealthUpContext>();
+            var mensagens = db.Mensagens.Include(m => m.IdPessoaReceiverNavigation).Include(m => m.IdPessoaSenderNavigation).Where(x => x.IdPessoaReceiver == Context.Session.GetString("UserId"));
+            var MensagensNaoLidas = mensagens.Where(m => m.Lida == false).Count();
+            var PedidosPendentesSocio = db.PedidosSocios.Count();
+            var PedidosProfessor = db.SolicitacaoProfessores.Where(s=>s.NumAdmin==null).Count();
+            var CotasAtraso = db.Cota.ToList().Where(c=>c.NumeroCotasNaoPagas!=0).Count();
+            var NotificacoesAdmin = CotasAtraso + PedidosProfessor + PedidosPendentesSocio;
+            var gym = db.Ginasios.SingleOrDefault();
+        }
+        <div class="logo">
+            <a asp-controller="Home" asp-action="Index"><img src="~/img/logo.png" width="70" height="70"></a>
+        </div>
+        <ul class="nav">
+            <li><a asp-controller="Home" asp-action="Index">Página Inicial</a></li>
+            <li><a asp-controller="Home" asp-action="Contactos">Contactos</a></li>
+            <li><a asp-controller="Home" asp-action="MapaAulas">Mapa semanal de aulas</a></li>
+            <li>
+                @if (Context.Session.GetString("UserId") == null)
+                {
+                    <a asp-controller="Utilizadores" asp-action="PedidoSocio">Aderir</a>
+                }
+            </li>
+            <li>
+                @if (Context.Session.GetString("UserId") == null)
+                {
+                    <a asp-controller="Utilizadores" asp-action="Login">Entrar</a>
+                }
+
+                @if (Context.Session.GetString("Role") == "Socio")
+                {
+                    <a href="#">
+                        Painel de sócios
+                        @if (MensagensNaoLidas > 0)
+                        {
+                            <span>(@MensagensNaoLidas)</span>
+                        }
+                        <i class="fa fa-chevron-down" style="font-size: .8em;"></i>
+                    </a>
+                    <ul>
+                        <li>
+                            <a asp-controller="Mensagens" asp-action="CaixaEntrada">
+                                Mensagens
+                                @if (MensagensNaoLidas > 0)
+                                {
+                                    <span>(@MensagensNaoLidas)</span>
+                                }
+                            </a>
+                        </li>
+                        @{
+                            var planos = db.PlanosTreino.Include(p => p.Contem).ThenInclude(cp => cp.IdExercicioNavigation).Include(p => p.NumProfessorNavigation).ThenInclude(p => p.NumProfessorNavigation).Include(p => p.NumSocioNavigation).ThenInclude(p => p.NumSocioNavigation).Where(p => p.NumSocio == Context.Session.GetString("UserId"));
+                        }
+                        @if (planos.Any() == true)
+                        {
+                            <li><a asp-controller="Socios" asp-action="ConsultarPlanoTreino">Plano de exercícios</a></li>
+                        }
+                        <li><a asp-controller="Socios" asp-action="ListarAulas"> Inscrição em aulas</a></li>
+                        <li><a asp-controller="Socios" asp-action="ConsultarHistoricoPeso">Histórico de peso</a></li>
+                        <li><a asp-controller="Socios" asp-action="HistoricoAulas">Histórico de aulas</a></li>
+                        @if (Context.Session.GetString("ExistePT") == "Sim")
+                        {
+                            <li><a asp-controller="Socios" asp-action="ConsultarInfoPT">Consultar Informação do PT</a></li>
+                        }
+                        else
+                        {
+                            <li><a asp-controller="Socios" asp-action="SolicitarPT">Solicitar Personal Trainer</a></li>
+                        }
+
+                    </ul>
+                }
+
+                @if (Context.Session.GetString("Role") == "Professor")
+                {
+                    <a href="#">
+                        Painel de professores
+                        @if (MensagensNaoLidas > 0)
+                        {
+                            <span>(@MensagensNaoLidas)</span>
+                        }
+                        <i class="fa fa-chevron-down" style="font-size: .8em;"></i>
+                    </a>
+                    <ul>
+                        <li>
+                            <a asp-controller="Mensagens" asp-action="CaixaEntrada">
+                                Mensagens
+                                @if (MensagensNaoLidas > 0)
+                                {
+                                    <span>(@MensagensNaoLidas)</span>
+                                }
+                            </a>
+                        </li>
+                        <li><a asp-controller="Professores" asp-action="RegistarPesoSocio">Registar peso de sócio</a></li>
+                        <li><a asp-controller="PlanoTreinos" asp-action="Index">Gerir plano de treinos</a></li>
+                        <li><a asp-controller="Professores" asp-action="ConsultarAulasQueLeciona">Consultar aulas que leciono</a></li>
+                        <li><a asp-controller="Professores" asp-action="ConsultarSociosInscritosAulas">Consultar sócios inscritos nas minhas aulas</a></li>
+                        <li><a asp-controller="Professores" asp-action="ConsultarMeusAlunos">Consultar os meus alunos</a></li>
+                    </ul>
+                }
+
+                @if (Context.Session.GetString("Role") == "Admin")
+                {
+                    <a href="#">
+                        Painel de gestão
+                        @if (NotificacoesAdmin > 0)
+                        {
+                            <span>(@NotificacoesAdmin)</span>
+                        }
+                        <i class="fa fa-chevron-down" style="font-size: .8em;"></i>
+                    </a>
+                    <ul>
+                        <li>
+                            <a asp-controller="Admins" asp-action="AprovarSocios">
+                                Aprovar pedidos de sócio pendentes
+                                @if (PedidosPendentesSocio > 0)
+                                {
+                                    <span>(@PedidosPendentesSocio)</span>
+                                }
+                            </a>
+                        </li>
+                        <li><a asp-controller="Admins" asp-action="GerirPessoas">Gerir pessoas </a></li>
+                        <li>
+                            <a asp-controller="Admins" asp-action="AprovarPedidoProf">
+                                Aprovar pedidos de personal trainer
+                                @if (PedidosProfessor > 0)
+                                {
+                                    <span>(@PedidosProfessor)</span>
+                                }
+                            </a>
+                        </li>
+                        <li><a asp-controller="Exercicios" asp-action="Index">Gerir exercícios</a></li>
+                        <li><a asp-controller="Aulas" asp-action="Index">Gerir aulas</a></li>
+                        <li><a asp-controller="Admins" asp-action="SuspenderUtilizador">Suspender utilizador</a></li>
+                        <li>
+                            <a asp-controller="Admins" asp-action="GerirCotas">
+                                Gerir cotas
+                                @if (CotasAtraso > 0)
+                                {
+                                    <span>(@CotasAtraso)</span>
+                                }
+                            </a>
+                        </li>
+                        <li><a asp-controller="Admins" asp-action="EditarInfoHealthUp">Editar informações do ginásio</a></li>
+                    </ul>
+                }
+            </li>
+
+            <li>
+                @if (Context.Session.GetString("UserId") != null)
+                {
+                    <a asp-controller="Utilizadores" asp-action="Logout">Sair</a>
+                }
+            </li>
+
+            <li class="phone-num">
+                <i class="fa fa-phone"></i><span>
+                    @{if (gym.Telemovel.Length != 9)
+                        {
+                            @gym.Telemovel.Substring(4, 9)
+                        }
+                        else
+                        {
+                            @gym.Telemovel
+                        } }
+                </span>
+            </li>
+        </ul>
+    </header>
+
+    <div>
+        <partial name="_CookieConsentPartial" />
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer Section Begin -->
+    <footer class="footer-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="footer-text">
+                        <div class="reserved">
+                            Copyright &copy;
+                            <script>document.write(new Date().getFullYear());</script> All rights reserved
+                        </div>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/neei.utad/"><i class="fab fa-facebook"></i></a>
+                            <a href="https://www.instagram.com/neei.utad/?hl=pt"><i class="fab fa-instagram"></i></a>
+                            <a href="https://twitter.com/7Andamos"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Section End -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+    <!-- Js Plugins -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/jquery.slicknav.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/circle-progress.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        window.addEventListener("pageshow", function (event) {
+            var historyTraversal = event.persisted ||
+                (typeof window.performance != "undefined" &&
+                    window.performance.navigation.type === 2);
+            if (historyTraversal) {
+                // Handle page restore.
+                window.location.reload();
+            }
+        });
+    </script>
+
+</body>
+</html>
